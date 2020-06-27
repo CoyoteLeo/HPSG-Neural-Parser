@@ -1,5 +1,3 @@
-import functools
-
 import numpy as np
 
 import torch
@@ -7,11 +5,13 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.init as init
 
+
 use_cuda = torch.cuda.is_available()
 if use_cuda:
     torch_t = torch.cuda
+
     def from_numpy(ndarray):
-        return torch.from_numpy(ndarray).pin_memory().cuda(async=True)
+        return torch.from_numpy(ndarray).pin_memory().cuda()
 else:
     print("Not using CUDA!")
     torch_t = torch
@@ -19,13 +19,7 @@ else:
 
 import pyximport
 pyximport.install(setup_args={"include_dirs": np.get_include()})
-#import src_dep_const_test.chart_helper as chart_helper
-import hpsg_decoder
-import const_decoder
-import makehp
-import utils
-
-import trees
+from src_joint import hpsg_decoder, const_decoder, makehp, utils, trees
 
 START = "<START>"
 STOP = "<STOP>"
@@ -634,7 +628,7 @@ def get_xlnet(xlnet_model, xlnet_do_lower_case):
 
 def get_bert(bert_model, bert_do_lower_case):
     # Avoid a hard dependency on BERT by only importing it if it's being used
-    from pretrained_bert import BertTokenizer, BertModel
+    from src_joint.pretrained_bert import BertTokenizer, BertModel
     if bert_model.endswith('.tar.gz'):
         tokenizer = BertTokenizer.from_pretrained(bert_model.replace('.tar.gz', '-vocab.txt'), do_lower_case=bert_do_lower_case)
     else:

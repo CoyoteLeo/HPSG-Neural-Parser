@@ -621,7 +621,7 @@ def get_elmo_class():
 
 def get_bert(bert_model, bert_do_lower_case):
     # Avoid a hard dependency on BERT by only importing it if it's being used
-    from pretrained_bert import BertTokenizer, BertModel
+    from src_division.pretrained_bert import BertTokenizer, BertModel
     if bert_model.endswith('.tar.gz'):
         tokenizer = BertTokenizer.from_pretrained(bert_model.replace('.tar.gz', '-vocab.txt'), do_lower_case=bert_do_lower_case)
     else:
