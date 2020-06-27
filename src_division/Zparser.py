@@ -286,7 +286,7 @@ class MultiHeadAttention(nn.Module):
         q_padded = Variable(q_padded)
         k_padded = Variable(k_padded)
         v_padded = Variable(v_padded)
-        invalid_mask = torch_t.ByteTensor(mb_size, len_padded).fill_(True)
+        invalid_mask = torch_t.BoolTensor(mb_size, len_padded).fill_(True)
 
         for i, (start, end) in enumerate(zip(batch_idxs.boundaries_np[:-1], batch_idxs.boundaries_np[1:])):
             q_padded[:,i,:end-start,:] = q_s[:,start:end,:]
@@ -1156,7 +1156,7 @@ class ChartParser(nn.Module):
             features = all_encoder_layers[-1]
 
             if self.encoder is not None:
-                features_packed = features.masked_select(all_word_end_mask.to(torch.uint8).unsqueeze(-1)).reshape(-1,features.shape[-1])
+                features_packed = features.masked_select(all_word_end_mask.to(torch.bool).unsqueeze(-1)).reshape(-1,features.shape[-1])
 
                 # For now, just project the features from the last word piece in each word
                 extra_content_annotations_list.append(self.project_bert(features_packed))
@@ -1191,8 +1191,8 @@ class ChartParser(nn.Module):
         else:
             assert self.bert is not None
             features = self.project_bert(features)
-            fencepost_annotations_start = features.masked_select(all_word_start_mask.to(torch.uint8).unsqueeze(-1)).reshape(-1, features.shape[-1])
-            fencepost_annotations_end = features.masked_select(all_word_end_mask.to(torch.uint8).unsqueeze(-1)).reshape(-1, features.shape[-1])
+            fencepost_annotations_start = features.masked_select(all_word_start_mask.to(torch.bool).unsqueeze(-1)).reshape(-1, features.shape[-1])
+            fencepost_annotations_end = features.masked_select(all_word_end_mask.to(torch.bool).unsqueeze(-1)).reshape(-1, features.shape[-1])
 
         fp_startpoints = batch_idxs.boundaries_np[:-1]
         fp_endpoints = batch_idxs.boundaries_np[1:] - 1
