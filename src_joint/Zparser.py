@@ -1,3 +1,5 @@
+from collections import Counter
+
 import numpy as np
 
 import torch
@@ -74,8 +76,15 @@ class BatchIndices:
 
         batch_idxs_np_extra = np.concatenate([[-1], batch_idxs_np, [-1]])
         self.boundaries_np = np.nonzero(batch_idxs_np_extra[1:] != batch_idxs_np_extra[:-1])[0]
-        self.seq_lens_np = self.boundaries_np[1:] - self.boundaries_np[:-1]
-        assert len(self.seq_lens_np) == self.batch_size
+
+        counter = Counter(batch_idxs_np)
+        self.seq_lens_np = np.empty(len(counter))
+        self.seq_lens_np[:] = np.NaN
+        for i, v in counter.items():
+            self.seq_lens_np[i] = v
+        assert not np.isnan(self.seq_lens_np).any()
+        self.seq_lens_np = self.seq_lens_np.astype(np.int64)
+
         self.max_len = int(np.max(self.boundaries_np[1:] - self.boundaries_np[:-1]))
 
 #
@@ -505,7 +514,11 @@ class MultiLevelEmbedding(nn.Module):
 
         # Combine the content and timing signals
         if self.partitioned:
-            annotations = torch.cat([content_annotations, timing_signal], 1)
+            try:
+                annotations = torch.cat([content_annotations, timing_signal], 1)
+            except Exception as e:
+                print(content_annotations.shape, timing_signal.shape)
+                raise e
         else:
             annotations = content_annotations + timing_signal
 
