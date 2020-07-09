@@ -514,15 +514,10 @@ class MultiLevelEmbedding(nn.Module):
 
         # Combine the content and timing signals
         if self.partitioned:
-            try:
-                annotations = torch.cat([content_annotations, timing_signal], 1)
-            except Exception as e:
-                print(content_annotations.shape, timing_signal.shape)
-                raise e
+            annotations = torch.cat([content_annotations, timing_signal], 1)
         else:
             annotations = content_annotations + timing_signal
 
-        #print(annotations.shape)
         annotations = self.layer_norm(self.dropout(annotations, batch_idxs))
         content_annotations = self.dropout(content_annotations, batch_idxs)
 
@@ -1095,7 +1090,6 @@ class ChartParser(nn.Module):
         word_idxs = np.zeros(packed_len, dtype=int)
         batch_idxs = np.zeros(packed_len, dtype=int)
         for snum, sentence in enumerate(sentences):
-            #print(sentence)
             for (tag, word) in [(START, START)] + sentence + [(STOP, STOP)]:
                 tag_idxs[i] = 0 if not self.use_tags else self.tag_vocab.index_or_unk(tag, TAG_UNK)
                 if word not in (START, STOP):
