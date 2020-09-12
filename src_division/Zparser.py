@@ -11,7 +11,7 @@ use_cuda = torch.cuda.is_available()
 if use_cuda:
     torch_t = torch.cuda
     def from_numpy(ndarray):
-        return torch.from_numpy(ndarray).pin_memory().cuda(async=True)
+        return torch.from_numpy(ndarray).pin_memory().cuda(non_blocking=True)
 else:
     print("Not using CUDA!")
     torch_t = torch
@@ -930,7 +930,7 @@ class ChartParser(nn.Module):
             nn.Linear(hparams.d_label_hidden, label_vocab.size - 1),
         )
 
-        self.loss_funt = torch.nn.CrossEntropyLoss(size_average=False)
+        self.loss_funt = torch.nn.CrossEntropyLoss(reduction='sum')
         if use_cuda:
             self.cuda()
 

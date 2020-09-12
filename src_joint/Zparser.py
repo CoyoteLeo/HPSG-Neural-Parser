@@ -1001,8 +1001,8 @@ class ChartParser(nn.Module):
             nn.Linear(hparams.d_label_hidden, label_vocab.size - 1 ),
             )
         self.dep_score = Dep_score(hparams, type_vocab.size)
-        self.loss_func = torch.nn.CrossEntropyLoss(size_average=False)
-        self.loss_funt = torch.nn.CrossEntropyLoss(size_average=False)
+        self.loss_func = torch.nn.CrossEntropyLoss(reduction='sum')
+        self.loss_funt = torch.nn.CrossEntropyLoss(reduction='sum')
 
 
         if use_cuda:
