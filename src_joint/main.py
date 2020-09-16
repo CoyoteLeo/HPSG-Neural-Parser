@@ -634,12 +634,7 @@ def run_parse(args):
     sentences = [sentence.split() for sentence in sentences]
 
     # Parser does not do tagging, so use a dummy tag when parsing from raw text
-    if 'UNK' in parser.tag_vocab.indices:
-        dummy_tag = 'UNK'
-    else:
-        dummy_tag = parser.tag_vocab.value(0)
-
-    start_time = time.time()
+    dummy_tag = 'UNK'
 
     def save_data(syntree_pred, cun):
         pred_head = [[leaf.father for leaf in tree.leaves()] for tree in syntree_pred]
